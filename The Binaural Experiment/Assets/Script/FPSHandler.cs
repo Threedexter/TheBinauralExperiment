@@ -95,7 +95,7 @@ public class FPSHandler : MonoBehaviour
             {
                 GetBaseInteractable(hit);
             }
-            if (interactable.getWithinRange())
+            if (interactable != null && interactable.getWithinRange())
             {
                 FreeLookEnabled = false;
                 interactable.OnInteract(true);

@@ -22,6 +22,8 @@ public class BaseInteractable : MonoBehaviour
     BoxCollider box;
     bool WithinRange;
     bool FinishedPuzzle;
+
+    FPSHandler playerHandler;
     #endregion
 
     #region UnityEngine
@@ -34,6 +36,8 @@ public class BaseInteractable : MonoBehaviour
             return;
         }
         box.size = new Vector3(BoxExtendX, BoxExtendY, BoxExtendZ);
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        playerHandler = player.GetComponentInParent<FPSHandler>();
     }
 
     #endregion
@@ -88,6 +92,8 @@ public class BaseInteractable : MonoBehaviour
     public void FinishPuzzle()
     {
         FinishedPuzzle = true;
+        canInteract = false;
+        playerHandler.WinPuzzle();
     }
     #endregion
 }
