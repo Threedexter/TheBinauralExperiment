@@ -8,8 +8,10 @@ public class TiltInteractable : MonoBehaviour
     #region Globals
     BaseInteractable baseInteract;
     public GameObject Maze;
+    public GameObject ball;
 
-    Vector3 startPosition;
+    Vector3 mazeStartPosition;
+    Vector3 ballStartPosition;
 
     [Range(0f, 10f)]
     public float sensitivityFactor;
@@ -18,12 +20,15 @@ public class TiltInteractable : MonoBehaviour
     [Range(0f, 90f)]
     public float maxTilt;
 
+    bool resetBall;
+
     #endregion
 
     #region UnityEngine
     void Start()
     {
-        startPosition = Maze.transform.localEulerAngles;
+        mazeStartPosition = Maze.transform.localEulerAngles;
+        ballStartPosition = ball.transform.position;
         baseInteract = GetComponent<BaseInteractable>();
         sensFact = 1 / sensitivityFactor;
     }
@@ -31,6 +36,7 @@ public class TiltInteractable : MonoBehaviour
     void Update()
     {
         MazeTilt();
+        CheckIfPlayerIsInRange();
     }
     #endregion
 
@@ -62,8 +68,6 @@ public class TiltInteractable : MonoBehaviour
         }
         Maze.transform.localEulerAngles = new Vector3(Maze.transform.localEulerAngles.x, Maze.transform.localEulerAngles.y, 0);
 
-        //Debug.Log("X:" + Maze.transform.localEulerAngles.x + ", Upper|Lower" + (startPosition.x + maxTilt) + "|" + (360 - maxTilt));
-
     }
 
     void YTilt(float axisval)
@@ -83,5 +87,19 @@ public class TiltInteractable : MonoBehaviour
         Maze.transform.localEulerAngles = new Vector3(Maze.transform.localEulerAngles.x, Maze.transform.localEulerAngles.y, 0);
     }
 
+    void CheckIfPlayerIsInRange()
+    {
+        if(!baseInteract.getWithinRange() && !baseInteract.getFinishedPuzzle() && !resetBall)
+        {
+            ball.transform.position = ballStartPosition;
+            resetBall = true;
+            Maze.transform.localEulerAngles = new Vector3(0, 0, 0);
+        }
+
+        if (baseInteract.getWithinRange())
+        {
+            resetBall = false;
+        }
+    }
     #endregion
 }

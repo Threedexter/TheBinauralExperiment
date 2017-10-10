@@ -49,6 +49,7 @@ public class SafeInteractable : MonoBehaviour
     {
         Interact();
         CheckCombination();
+        CheckForResetCombination();
     }
     #endregion
 
@@ -74,6 +75,15 @@ public class SafeInteractable : MonoBehaviour
     public bool getWithinRange()
     {
         return baseInteract.getWithinRange();
+    }
+
+    void CheckForResetCombination()
+    {
+        if(!getWithinRange() && !baseInteract.getFinishedPuzzle() && StepIndex > 0)
+        {
+            ClickSource.PlayOneShot(clips[1]);
+            StepIndex = 0;
+        }
     }
     #endregion
 
