@@ -7,9 +7,7 @@ public class FPSHandler : MonoBehaviour
     #region Globals
     public Camera cam;
     [Range(0.0f, 2.0f)]
-    public float MoveSpeedX = 0.2f;
-    [Range(0.0f, 2.0f)]
-    public float MoveSpeedZ = 0.2f;
+    public float MoveSpeed = 0.2f;
     [Range(1f, 10f)]
     public float lookSensitivity = 5f;
 
@@ -25,7 +23,7 @@ public class FPSHandler : MonoBehaviour
     #region UnityEngine
     void Start()
     {
-        slowMoveSpeed = MoveSpeedZ;
+        slowMoveSpeed = MoveSpeed;
         Cursor.visible = false;
     }
 
@@ -44,8 +42,8 @@ public class FPSHandler : MonoBehaviour
     {
         Vector3 camVectorFwdLocked = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z);
         Vector3 camVectorRgtLocked = new Vector3(cam.transform.right.x, 0, cam.transform.right.z);
-        transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeedZ * 10 : MoveSpeedZ));
-        transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeedX);
+        transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
+        transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
     }
 
     void Look()
