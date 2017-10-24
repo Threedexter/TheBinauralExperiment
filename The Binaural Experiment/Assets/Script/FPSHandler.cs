@@ -82,6 +82,19 @@ public class FPSHandler : MonoBehaviour
     }
     #endregion
 
+    void OnCollisionEnter(Collision col)
+    {
+        if(col != null && col.gameObject.tag == "Wall")
+        {
+            Debug.Log("HitAWall");
+        }
+    }
+
+    private void OnCollisionExit(Collision col)
+    {
+        Debug.Log("Stopped Hit");
+    }
+
     #region Interact
     void Interact()
     {
