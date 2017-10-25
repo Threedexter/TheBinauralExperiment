@@ -20,6 +20,7 @@ public class BaseInteractable : MonoBehaviour
     bool canInteract;
 
     BoxCollider box;
+    public GameObject interactionIndicator;
     bool WithinRange;
     bool FinishedPuzzle;
 
@@ -38,6 +39,12 @@ public class BaseInteractable : MonoBehaviour
         box.size = new Vector3(BoxExtendX, BoxExtendY, BoxExtendZ);
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         playerHandler = player.GetComponentInParent<FPSHandler>();
+        ToggleRenderer(false);
+    }
+
+    void Update()
+    {
+        FadeBox();
     }
 
     #endregion
@@ -47,15 +54,17 @@ public class BaseInteractable : MonoBehaviour
     {
         if (other.tag != "Player")
         {
-            WithinRange = true;
+            WithinRange = false;
             return;
         }
         WithinRange = true;
+        if(!getFinishedPuzzle()) ToggleRenderer(true);
     }
 
     void OnTriggerExit(Collider other)
     {
         WithinRange = false;
+        ToggleRenderer(false);
     }
 
     public bool getWithinRange()
@@ -69,6 +78,14 @@ public class BaseInteractable : MonoBehaviour
         {
             canInteract = active;
         }
+        if (canInteract)
+        {
+            ToggleRenderer(false);
+        }
+        else if(!canInteract && getWithinRange() && !getFinishedPuzzle())
+        {
+            ToggleRenderer(true);
+        }
     }
     #endregion
 
@@ -80,8 +97,8 @@ public class BaseInteractable : MonoBehaviour
 
     public void setCanInteract(bool interactable)
     {
-        if(!FinishedPuzzle)
-        canInteract = interactable;
+        if (!FinishedPuzzle)
+            canInteract = interactable;
     }
 
     public bool getFinishedPuzzle()
@@ -95,5 +112,41 @@ public class BaseInteractable : MonoBehaviour
         canInteract = false;
         playerHandler.WinPuzzle();
     }
+    #endregion
+
+    #region materialHandling
+
+    float lastColorChangeTime;
+
+    void FadeBox()
+    {
+        Material material = interactionIndicator.GetComponent<Renderer>().material;
+        float FadeDuration = 1f;
+        Color matColor = interactionIndicator.GetComponent<Renderer>().material.color;
+        Color startColor = new Color(matColor.r, matColor.g, matColor.b, 0.5f);
+        Color endColor = new Color(matColor.r, matColor.g, matColor.b, 0.1f);
+
+        var ratio = (Time.time - lastColorChangeTime) / FadeDuration;
+        ratio = Mathf.Clamp01(ratio);
+        //material.color = Color.Lerp(startColor, endColor, ratio);
+        material.color = Color.Lerp(startColor, endColor, Mathf.Sqrt(ratio)); // A cool effect
+        //material.color = Color.Lerp(startColor, endColor, ratio * ratio); // Another cool effect
+
+        if (ratio == 1f)
+        {
+            lastColorChangeTime = Time.time;
+
+            // Switch colors
+            var temp = startColor;
+            startColor = endColor;
+            endColor = temp;
+        }
+    }
+
+    void ToggleRenderer(bool mode)
+    {
+        interactionIndicator.GetComponent<Renderer>().enabled = mode;
+    }
+
     #endregion
 }

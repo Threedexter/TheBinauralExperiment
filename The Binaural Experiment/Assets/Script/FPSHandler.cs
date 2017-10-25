@@ -14,6 +14,9 @@ public class FPSHandler : MonoBehaviour
     float slowMoveSpeed;
     bool isSprinting;
     bool FreeLookEnabled = true;
+    bool canMove = true;
+
+    float startY;
 
     BaseInteractable interactable;
 
@@ -25,6 +28,7 @@ public class FPSHandler : MonoBehaviour
     {
         slowMoveSpeed = MoveSpeed;
         Cursor.visible = false;
+        startY = transform.position.y; 
     }
 
     // Update is called once per frame
@@ -40,10 +44,15 @@ public class FPSHandler : MonoBehaviour
     #region Movement
     void Move()
     {
-        Vector3 camVectorFwdLocked = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z);
-        Vector3 camVectorRgtLocked = new Vector3(cam.transform.right.x, 0, cam.transform.right.z);
-        transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
-        transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
+        if (canMove)
+        {
+            Vector3 camVectorFwdLocked = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z);
+            Vector3 camVectorRgtLocked = new Vector3(cam.transform.right.x, 0, cam.transform.right.z);
+            transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
+            transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
+        }
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+        transform.position = new Vector3(transform.position.x, startY, transform.position.z);
     }
 
     void Look()
@@ -84,10 +93,16 @@ public class FPSHandler : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if(col != null && col.gameObject.tag == "Wall")
-        {
-            Debug.Log("HitAWall");
-        }
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+        transform.position = new Vector3(transform.position.x, startY, transform.position.z);
+        StartCoroutine(ResetConstraints());
+    }
+
+    IEnumerator ResetConstraints()
+    {
+        yield return new WaitForSeconds(0.1f);
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
     }
 
     private void OnCollisionExit(Collision col)
@@ -144,4 +159,9 @@ public class FPSHandler : MonoBehaviour
         }
     }
     #endregion
+
+    public void setCanMove(bool value)
+    {
+        canMove = value;
+    }
 }

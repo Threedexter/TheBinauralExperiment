@@ -102,4 +102,12 @@ public class TiltInteractable : MonoBehaviour
         }
     }
     #endregion
+
+    void RemoveBallAfterPuzzle()
+    {
+        if(baseInteract.getFinishedPuzzle())
+        {
+            ball.SetActive(false);
+        }
+    }
 }
