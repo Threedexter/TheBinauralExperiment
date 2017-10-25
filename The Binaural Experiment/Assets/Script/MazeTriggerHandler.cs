@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class MazeTriggerHandler : MonoBehaviour
 {
+    #region Globals
     public enum TriggerSoundType { Pos, Good, Bad, End }
 
     public BoxCollider TriggerBox;
@@ -20,35 +21,9 @@ public class MazeTriggerHandler : MonoBehaviour
     }
 
     bool hasPlayed;
+    #endregion
 
-    public void playSound(TriggerSoundType type)
-    {
-        interactSource.PlayOneShot(triggerClips[(int)type]);
-        if(type == TriggerSoundType.End)
-        {
-            baseInteract.FinishPuzzle();
-        }
-        //switch (type)
-        //{
-        //    case TriggerSoundType.Bad:
-        //        interactSource.PlayOnce(trigger);
-        //        Debug.Log("Hit a wrong turn");
-        //        break;
-        //    case TriggerSoundType.Good:
-        //        Debug.Log("Going right way");
-        //        break;
-        //    case TriggerSoundType.Pos:
-        //        Debug.Log("Hit A wall");
-        //        break;
-        //    case TriggerSoundType.End:
-        //        baseInteract.FinishPuzzle();
-        //        Debug.Log("Hit the end");
-        //        break;
-        //    case TriggerSoundType.Start:
-        //        break;
-        //}
-    }
-
+    #region Triggers
     void OnTriggerEnter(Collider other)
     {
         if (other.tag == "ObjectiveBall" && !hasPlayed)
@@ -66,9 +41,21 @@ public class MazeTriggerHandler : MonoBehaviour
         }
 
     }
+    #endregion
 
+    #region Audio
     public void SetAudioClips(AudioClip[] clips)
     {
         triggerClips = clips;
     }
+
+    public void playSound(TriggerSoundType type)
+    {
+        interactSource.PlayOneShot(triggerClips[(int)type]);
+        if (type == TriggerSoundType.End)
+        {
+            baseInteract.FinishPuzzle();
+        }
+    }
+    #endregion
 }

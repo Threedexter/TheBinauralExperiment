@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MazeSoundHandler : MonoBehaviour
 {
-
+    #region Globals
     public GameObject ball;
     public GameObject player;
 
@@ -13,7 +13,9 @@ public class MazeSoundHandler : MonoBehaviour
     public MazeTriggerHandler[] handlers;
 
     public AudioClip[] TriggerAudioClips;
+    #endregion
 
+    #region UnityEngine
     void Start()
     {
         SetParamForHandlers(handlers);
@@ -28,7 +30,9 @@ public class MazeSoundHandler : MonoBehaviour
 
         SetPanAndVolume(pan, vol);
     }
+    #endregion
 
+    #region AudioParams
     float PanningValue(Vector3 OriginPos, Vector3 ballPos)
     {
         float angle = OriginPos.z - ballPos.z;
@@ -56,7 +60,9 @@ public class MazeSoundHandler : MonoBehaviour
         Vector3 vel = obj.GetComponent<Rigidbody>().velocity;
         return vel.magnitude;
     }
+    #endregion
 
+    #region externalHandlers
     void SetParamForHandlers(MazeTriggerHandler[] triggerHandlers)
     {
         int i;
@@ -69,4 +75,5 @@ public class MazeSoundHandler : MonoBehaviour
             triggerHandlers[i].SetAudioClips(TriggerAudioClips);
         }
     }
+    #endregion
 }
