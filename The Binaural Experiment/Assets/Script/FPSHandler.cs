@@ -7,15 +7,16 @@ public class FPSHandler : MonoBehaviour
     #region Globals
     public Camera cam;
     [Range(0.0f, 2.0f)]
-    public float MoveSpeedX = 0.2f;
-    [Range(0.0f, 2.0f)]
-    public float MoveSpeedZ = 0.2f;
+    public float MoveSpeed = 0.2f;
     [Range(1f, 10f)]
     public float lookSensitivity = 5f;
 
     float slowMoveSpeed;
     bool isSprinting;
     bool FreeLookEnabled = true;
+    bool canMove = true;
+
+    float startY;
 
     BaseInteractable interactable;
 
@@ -25,8 +26,9 @@ public class FPSHandler : MonoBehaviour
     #region UnityEngine
     void Start()
     {
-        slowMoveSpeed = MoveSpeedZ;
+        slowMoveSpeed = MoveSpeed;
         Cursor.visible = false;
+        startY = transform.position.y; 
     }
 
     // Update is called once per frame
@@ -42,10 +44,15 @@ public class FPSHandler : MonoBehaviour
     #region Movement
     void Move()
     {
-        Vector3 camVectorFwdLocked = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z);
-        Vector3 camVectorRgtLocked = new Vector3(cam.transform.right.x, 0, cam.transform.right.z);
-        transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeedZ * 10 : MoveSpeedZ));
-        transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeedX);
+        if (canMove)
+        {
+            Vector3 camVectorFwdLocked = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z);
+            Vector3 camVectorRgtLocked = new Vector3(cam.transform.right.x, 0, cam.transform.right.z);
+            transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
+            transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
+        }
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+        transform.position = new Vector3(transform.position.x, startY, transform.position.z);
     }
 
     void Look()
@@ -84,6 +91,25 @@ public class FPSHandler : MonoBehaviour
     }
     #endregion
 
+    void OnCollisionEnter(Collision col)
+    {
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+        transform.position = new Vector3(transform.position.x, startY, transform.position.z);
+        StartCoroutine(ResetConstraints());
+    }
+
+    IEnumerator ResetConstraints()
+    {
+        yield return new WaitForSeconds(0.1f);
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+    }
+
+    private void OnCollisionExit(Collision col)
+    {
+        Debug.Log("Stopped Hit");
+    }
+
     #region Interact
     void Interact()
     {
@@ -95,7 +121,7 @@ public class FPSHandler : MonoBehaviour
             {
                 GetBaseInteractable(hit);
             }
-            if (interactable.getWithinRange())
+            if (interactable != null && interactable.getWithinRange())
             {
                 FreeLookEnabled = false;
                 interactable.OnInteract(true);
@@ -133,4 +159,9 @@ public class FPSHandler : MonoBehaviour
         }
     }
     #endregion
+
+    public void setCanMove(bool value)
+    {
+        canMove = value;
+    }
 }

@@ -49,6 +49,7 @@ public class SafeInteractable : MonoBehaviour
     {
         Interact();
         CheckCombination();
+        CheckForResetCombination();
     }
     #endregion
 
@@ -75,6 +76,15 @@ public class SafeInteractable : MonoBehaviour
     {
         return baseInteract.getWithinRange();
     }
+
+    void CheckForResetCombination()
+    {
+        if(!getWithinRange() && !baseInteract.getFinishedPuzzle() && StepIndex > 0)
+        {
+            ClickSource.PlayOneShot(clips[1]);
+            StepIndex = 0;
+        }
+    }
     #endregion
 
     #region combinationHandling
@@ -90,16 +100,9 @@ public class SafeInteractable : MonoBehaviour
             PlayedClick = true;
             if (StepIndex == 2)
             {
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                FPSHandler handler = player.GetComponentInParent<FPSHandler>();
-                if(handler != null)
-                {
-                    baseInteract.setCanInteract(false);
-                    baseInteract.FinishPuzzle();
-                    handler.WinPuzzle();
-                    StepIndex = 0;
-                }
-                return;
+                baseInteract.setCanInteract(false);
+                baseInteract.FinishPuzzle();
+                StepIndex = 0;
             }
             StepIndex++;
         }
@@ -138,7 +141,7 @@ public class SafeInteractable : MonoBehaviour
                     screechSource.Play();
                 }
             }
-            if(cur != goal && Mathf.Abs(inputAngle) < 0.5)
+            if (cur != goal && Mathf.Abs(inputAngle) < 0.5)
             {
                 if (screechSource.isPlaying)
                 {
@@ -179,10 +182,10 @@ public class SafeInteractable : MonoBehaviour
     {
         if ((!compareDirection(cur, goal) && compareAroundValue(orig, other, error)) || (inputAngle > 2 && compareAroundValue(orig, other, error)))
         {
-            if(baseInteract.getCanInteract())
+            if (baseInteract.getCanInteract())
             {
                 ClickSource.PlayOneShot(clips[1]);
-            }            
+            }
         }
     }
 
