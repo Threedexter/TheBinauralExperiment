@@ -59,7 +59,7 @@ public class StoryHandler : MonoBehaviour
 
     void CheckForActiveVoice()
     {
-        if (!voiceSource.isPlaying)
+        if (!voiceSource.isPlaying && !player.getCanMove())
         {
             player.setCanMove(true);
         }

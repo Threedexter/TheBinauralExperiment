@@ -5,6 +5,7 @@ using UnityEngine;
 public class PuzzleHandler : MonoBehaviour {
 
     public BaseInteractable[] puzzles;
+    public Animator anim;
 
     public Light[] StatusLights;
 
@@ -54,6 +55,14 @@ public class PuzzleHandler : MonoBehaviour {
 
     void OpenDoor()
     {
-        Debug.Log("YOU'VE WON");
+        anim.Play("DoorAnim");
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other != null && other.tag == "Player")
+        {
+
+        }
     }
 }
