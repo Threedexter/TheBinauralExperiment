@@ -48,8 +48,22 @@ public class FPSHandler : MonoBehaviour
         {
             Vector3 camVectorFwdLocked = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z);
             Vector3 camVectorRgtLocked = new Vector3(cam.transform.right.x, 0, cam.transform.right.z);
-            transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
-            transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
+            if (Mathf.Abs(Input.GetAxis("Vertical")) > 0)
+            {
+                transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
+            }
+            if (Mathf.Abs(Input.GetAxis("Vertical")) <= 0)
+            {
+                GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX;
+            }
+            if(Mathf.Abs(Input.GetAxis("Horizontal")) > 0)
+            {
+                transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
+            }
+            if(Mathf.Abs(Input.GetAxis("Horizontal")) <= 0)
+            {
+                GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY;
+            }            
         }
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
         transform.position = new Vector3(transform.position.x, startY, transform.position.z);
