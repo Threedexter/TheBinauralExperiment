@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class StoryHandler : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class StoryHandler : MonoBehaviour
     {
         CheckForActiveVoice();
         Skip();
+        Reset();
     }
 
     IEnumerator VoiceDelay()
@@ -68,6 +70,14 @@ public class StoryHandler : MonoBehaviour
         if (Input.GetButtonDown("Skip"))
         {
             voiceSource.Stop();
+        }
+    }
+
+    void Reset()
+    {
+        if(Input.GetButtonDown("Reset"))
+        {
+            SceneManager.LoadScene(0);
         }
     }
 }
