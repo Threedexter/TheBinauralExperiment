@@ -77,7 +77,6 @@ public class LeverInteractable : MonoBehaviour
         yield return new WaitForSeconds(discrepancyDelay);
         canTrigger = false;
         if (!hasTriggeredThisTick) amountOfTriggersDone = 0;
-        Debug.Log("CanTrigger=Off");
     }
 
     void InputHandling()
@@ -161,7 +160,6 @@ public class LeverInteractable : MonoBehaviour
                 if (canTrigger && currentDirection == LeverDirection.Left && lastTriggerDir != currentDirection)
                 {
                     lastTriggerDir = currentDirection;
-                    Debug.Log("TriggerLeft");
                     amountOfTriggersDone++;
                     hasTriggeredThisTick = true;
 
@@ -187,7 +185,6 @@ public class LeverInteractable : MonoBehaviour
             if (canTrigger && currentDirection == LeverDirection.Right && lastTriggerDir != currentDirection)
             {
                 lastTriggerDir = currentDirection;
-                Debug.Log("TriggerRight");
                 amountOfTriggersDone++;
                 hasTriggeredThisTick = true;
             }

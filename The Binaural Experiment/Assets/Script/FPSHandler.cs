@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class FPSHandler : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class FPSHandler : MonoBehaviour
     {
         slowMoveSpeed = MoveSpeed;
         Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
         startY = transform.position.y;
         playerRigid = GetComponent<Rigidbody>();
     }
@@ -47,6 +49,7 @@ public class FPSHandler : MonoBehaviour
         Look();
         Sprint();
         Interact();
+        Cancel();
     }
     #endregion
 
@@ -115,26 +118,21 @@ public class FPSHandler : MonoBehaviour
             isSprinting = false;
         }
     }
+
+    void Cancel()
+    {
+        if (Input.GetButtonDown("Cancel"))
+        {
+            SceneManager.LoadScene("StartScene");
+        }
+    }
     #endregion
 
     void OnCollisionEnter(Collision col)
     {
-        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
         transform.position = new Vector3(transform.position.x, startY, transform.position.z);
         this.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
-        StartCoroutine(ResetConstraints());
-    }
-
-    IEnumerator ResetConstraints()
-    {
-        yield return new WaitForSeconds(0.1f);
-        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
-    }
-
-    private void OnCollisionExit(Collision col)
-    {
-        Debug.Log("Stopped Hit");
     }
 
     #region Interact
