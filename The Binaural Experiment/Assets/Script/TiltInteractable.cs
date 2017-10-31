@@ -37,6 +37,7 @@ public class TiltInteractable : MonoBehaviour
     {
         MazeTilt();
         CheckIfPlayerIsInRange();
+        CheckBallPosition();
     }
     #endregion
 
@@ -108,6 +109,16 @@ public class TiltInteractable : MonoBehaviour
         if(baseInteract.getFinishedPuzzle())
         {
             ball.SetActive(false);
+        }
+    }
+
+    void CheckBallPosition()
+    {
+        if(ball.transform.position.y < 1.18)
+        {
+            ball.transform.position = ballStartPosition;
+            resetBall = true;
+            Maze.transform.localEulerAngles = new Vector3(0, 0, 0);
         }
     }
 }

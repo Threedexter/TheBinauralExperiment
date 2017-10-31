@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class FPSHandler : MonoBehaviour
 {
     #region Globals
     public Camera cam;
-    [Range(0.0f, 2.0f)]
+    [Range(0.0f, 100.0f)]
     public float MoveSpeed = 0.2f;
     [Range(1f, 10f)]
     public float lookSensitivity = 5f;
@@ -15,6 +17,13 @@ public class FPSHandler : MonoBehaviour
     bool isSprinting;
     bool FreeLookEnabled = true;
     bool canMove = true;
+
+    float alpha = 0f;
+    private float fadeDir = -0f;
+    public float fadeSpeed = 0.3f;
+    public Image panel;
+
+    Rigidbody playerRigid;
 
     float startY;
 
@@ -28,7 +37,9 @@ public class FPSHandler : MonoBehaviour
     {
         slowMoveSpeed = MoveSpeed;
         Cursor.visible = false;
-        startY = transform.position.y; 
+        Cursor.lockState = CursorLockMode.Locked;
+        startY = transform.position.y;
+        playerRigid = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -38,6 +49,7 @@ public class FPSHandler : MonoBehaviour
         Look();
         Sprint();
         Interact();
+        Cancel();
     }
     #endregion
 
@@ -50,23 +62,26 @@ public class FPSHandler : MonoBehaviour
             Vector3 camVectorRgtLocked = new Vector3(cam.transform.right.x, 0, cam.transform.right.z);
             if (Mathf.Abs(Input.GetAxis("Vertical")) > 0)
             {
-                transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
+                playerRigid.AddForce((camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed)), ForceMode.VelocityChange);
+                //transform.position = transform.position + (camVectorFwdLocked * Input.GetAxis("Vertical") * (isSprinting ? MoveSpeed * 10 : MoveSpeed));
             }
             if (Mathf.Abs(Input.GetAxis("Vertical")) <= 0)
             {
-                GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX;
+                playerRigid.velocity = new Vector3(playerRigid.velocity.x, 0, 0);
+                playerRigid.angularVelocity = new Vector3(playerRigid.angularVelocity.x, 0, 0);
             }
-            if(Mathf.Abs(Input.GetAxis("Horizontal")) > 0)
+            if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0)
             {
-                transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
+                playerRigid.AddForce((camVectorRgtLocked * Input.GetAxis("Horizontal") * (isSprinting ? MoveSpeed * 10 : MoveSpeed)), ForceMode.VelocityChange);
+                //transform.position = transform.position + (camVectorRgtLocked * Input.GetAxis("Horizontal") * MoveSpeed);
             }
-            if(Mathf.Abs(Input.GetAxis("Horizontal")) <= 0)
+            if (Mathf.Abs(Input.GetAxis("Horizontal")) <= 0)
             {
-                GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY;
-            }            
+                playerRigid.velocity = new Vector3(0, 0, playerRigid.velocity.z);
+                playerRigid.angularVelocity = new Vector3(0, 0, playerRigid.angularVelocity.z);
+            }
         }
-        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
-        transform.position = new Vector3(transform.position.x, startY, transform.position.z);
+
     }
 
     void Look()
@@ -103,25 +118,21 @@ public class FPSHandler : MonoBehaviour
             isSprinting = false;
         }
     }
+
+    void Cancel()
+    {
+        if (Input.GetButtonDown("Cancel"))
+        {
+            SceneManager.LoadScene("StartScene");
+        }
+    }
     #endregion
 
     void OnCollisionEnter(Collision col)
     {
-        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
         transform.position = new Vector3(transform.position.x, startY, transform.position.z);
-        StartCoroutine(ResetConstraints());
-    }
-
-    IEnumerator ResetConstraints()
-    {
-        yield return new WaitForSeconds(0.1f);
-        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
-    }
-
-    private void OnCollisionExit(Collision col)
-    {
-        Debug.Log("Stopped Hit");
+        this.GetComponent<Rigidbody>().velocity = new Vector3(0, 0, 0);
     }
 
     #region Interact
@@ -177,5 +188,32 @@ public class FPSHandler : MonoBehaviour
     public void setCanMove(bool value)
     {
         canMove = value;
+    }
+
+    public bool getCanMove()
+    {
+        return canMove;
+    }
+
+    public void fadeCameraOut()
+    {
+        fadeDir = 1;
+        alpha = 0;
+    }
+
+    void OnGUI()
+    {
+        if (panel != null)
+        {
+            alpha += fadeDir * fadeSpeed * Time.deltaTime;
+            alpha = Mathf.Clamp01(alpha);
+
+            panel.color = new Color(0, 0, 0, alpha);
+        }
+    }
+
+    public float getAlpha()
+    {
+        return alpha;
     }
 }
